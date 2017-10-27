@@ -1,0 +1,19 @@
+.PHONY: check-syntax clean run
+
+NAME=
+
+all: $(NAME)
+
+run: $(NAME)
+	java $^
+
+$(NAME): $(NAME).java
+	javac $^
+
+clean:
+	rm -fr *.class
+
+check-syntax:
+	mkdir -p "/tmp/flymake-java"
+	javac -Xlint -d "/tmp/flymake-java" $(CHK_SOURCES)
+	rm -r "/tmp/flymake-java"
