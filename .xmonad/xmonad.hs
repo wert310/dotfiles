@@ -7,6 +7,8 @@ import XMonad.Hooks.SetWMName
 import XMonad.Util.Scratchpad
 import qualified XMonad.StackSet as SS
 
+import XMonad.Layout.Spacing
+
 import Data.Char (toUpper)
 import Data.Function ((&))
 import Data.Monoid ((<>))
@@ -22,7 +24,8 @@ main = do
     , manageHook         = manageHook config <+> myManageHook <+> manageScratchpad
     , focusFollowsMouse  = True
     , workspaces         = myWorkspaces
-    , layoutHook         = smartBorders . avoidStruts $ (Tall 1 (3/100) (1/2) ||| Full)
+    , layoutHook         = smartBorders . avoidStruts $ 
+                             ({- smartSpacing 5 -} (Tall 1 (3/100) (1/2)) ||| Full)
     , borderWidth        = 1
     , normalBorderColor  = "#444444"
     , focusedBorderColor = "#005577"
@@ -44,6 +47,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
   , ((modm .|. shiftMask,   xK_r),   spawn "xmonad --recompile && xmonad --restart")
   , ((modm,                 xK_m),   sendMessage NextLayout)
   , ((0,                    xK_F10), scratchpadSpawnActionCustom "termite --name=scratchpad")
+  --  , ((modm .|. controlMask, xK_l),   spawn "i3lock -efc 414141")
   ]
 
 deleteKeys :: XConfig Layout -> M.Map (ButtonMask, KeySym) (X ()) -> M.Map (ButtonMask, KeySym) (X ())

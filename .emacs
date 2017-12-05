@@ -167,6 +167,13 @@
   (add-to-list 'auto-mode-alist '("\\.js?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode)))
 
+(use-package neotree
+  :init
+  (global-set-key [f9] 'neotree-toggle)
+  (setq neo-smart-open t)
+  (evil-set-initial-state 'neotree-mode 'emacs))
+
+
 (use-package rust-mode)
 (use-package cargo :init (add-hook 'rust-mode-hook 'cargo-minor-mode))
 (use-package tuareg)
@@ -192,6 +199,9 @@
 
 ;;; Hide scrollbar
 (scroll-bar-mode -1)
+
+;;; Hide menu-bar
+(menu-bar-mode -1)
 
 ;; Default Font
 (setq wert-font "Hack 9"); monospace 9
@@ -249,6 +259,10 @@
 ;;; Global hTODO mode
 (global-htodo-mode 1)
 
+;;; Global auto-revert-mode
+(global-auto-revert-mode 1)
+(add-hook 'dired-mode-hook 'auto-revert-mode)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; KEYS
 
@@ -274,7 +288,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (markdown-mode web-mode use-package tuareg highlight-symbol haskell-mode flymake-cursor evil engine-mode column-enforce-mode cargo))))
+    (neotree markdown-mode web-mode use-package tuareg highlight-symbol haskell-mode flymake-cursor evil engine-mode column-enforce-mode cargo))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
