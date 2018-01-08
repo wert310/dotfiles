@@ -25,7 +25,7 @@ main = do
     , focusFollowsMouse  = True
     , workspaces         = myWorkspaces
     , layoutHook         = smartBorders . avoidStruts $ 
-                             ({- smartSpacing 5 -} (Tall 1 (3/100) (1/2)) ||| Full)
+                             (spacing 5 (Tall 1 (3/100) (1/2)) ||| Full)
     , borderWidth        = 1
     , normalBorderColor  = "#444444"
     , focusedBorderColor = "#005577"
@@ -69,6 +69,6 @@ myManageHook = composeAll $ customFloats <> plasmaFloats
 manageScratchpad :: ManageHook
 manageScratchpad = scratchpadManageHook $ SS.RationalRect left top width height
   where left   = 0.1
-        top    = 0
+        top    = 0.15
         width  = 0.8
         height = 0.7
