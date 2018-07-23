@@ -51,6 +51,15 @@
             (right (swap right buffer))
             (t (error "Cannot find left or right split"))))))
 
+(defun calc-region (beg end)
+  "Do a quick calculation from region"
+  (interactive "r")
+  (if (integerp end)
+      (setq end (copy-marker end)))
+      (let ((res (calc-eval (buffer-substring beg end))))
+        (message "Result: %s" res)
+        (kill-new res)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; HIGHLIGHT TODOs (htodo-mode) based on superego.el
 
@@ -141,7 +150,16 @@
   :init
   (add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
   (add-hook 'haskell-mode-hook 'turn-on-haskell-doc)
-  (add-hook 'haskell-mode-hook 'interactive-haskell-mode))
+  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (setq haskell-process-args-ghci
+        '("-ferror-spans" "-fshow-loaded-modules"))
+  (setq haskell-process-args-cabal-repl
+        '("--ghc-options=-ferror-spans -fshow-loaded-modules"))
+  (setq haskell-process-args-stack-ghci
+        '("--ghci-options=-ferror-spans -fshow-loaded-modules"
+          "--no-build" "--no-load"))
+  (setq haskell-process-args-cabal-new-repl
+        '("--ghc-options=-ferror-spans -fshow-loaded-modules")))
 
 (use-package highlight-symbol
   :init
@@ -182,6 +200,10 @@
 (use-package flymake-cursor)
 (use-package markdown-mode)
 
+(use-package monokai-theme
+  :init
+  (load-theme 'monokai t))
+
 ;; Show compiler warnings
 (setq byte-compile-warnings t)
 
@@ -189,7 +211,7 @@
 ;; DEFAULTS
 
 ;;; set current theme to the bundled "misterioso"
-(load-theme 'misterioso)
+;(load-theme 'misterioso)
 
 ;;; Bracket highlighting
 (show-paren-mode 1)
@@ -231,8 +253,14 @@
 (setq-default indent-tabs-mode nil)
 
 ;;; Scrolling 1 line at time
-(setq scroll-step            1
-      scroll-conservatively  10000)
+; (setq scroll-step            1
+;       scroll-conservatively  10000)
+
+(setq redisplay-dont-pause t
+      scroll-margin 1
+      scroll-step 1
+      scroll-conservatively 10000
+      scroll-preserve-screen-position 1)
 
 ;;; Inhibit splash screen
 (setq inhibit-startup-message t)
@@ -263,6 +291,22 @@
 (global-auto-revert-mode 1)
 (add-hook 'dired-mode-hook 'auto-revert-mode)
 
+;;; Global hl-line mode
+(global-hl-line-mode 1)
+
+;;; c++ mode for h files
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+
+;;; c++ mode for arduino files
+(add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
+
+;;; font lock optimizations
+(setq font-lock-support-mode 'jit-lock-mode)
+(setq jit-lock-stealth-time 16
+      jit-lock-defer-contextually t
+      jit-lock-stealth-nice 0.5)
+(setq-default font-lock-multiline t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; KEYS
 
@@ -281,17 +325,3 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CUSTOM
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (neotree markdown-mode web-mode use-package tuareg highlight-symbol haskell-mode flymake-cursor evil engine-mode column-enforce-mode cargo))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
