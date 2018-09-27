@@ -284,6 +284,9 @@
 ;;; Shift Select Org Mode
 (setq-default org-support-shift-select t)
 
+;;; Org mode caption below images/tables
+(setq org-latex-caption-above nil)
+
 ;;; Global hTODO mode
 (global-htodo-mode 1)
 
