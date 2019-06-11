@@ -7,7 +7,7 @@
   (require 'package)
   (add-to-list
    'package-archives
-   '("melpa" . "http://melpa.org/packages/") t)
+   '("melpa" . "https://melpa.org/packages/") t)
   (package-initialize))
 
 (when (not (package-installed-p 'use-package))
@@ -59,6 +59,16 @@
       (let ((res (calc-eval (buffer-substring beg end))))
         (message "Result: %s" res)
         (kill-new res)))
+
+(cl-defun toggle-transparency (&key (level '(90 . 90)))
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha)))
+    (set-frame-parameter nil 'alpha
+                         (cond ((null alpha) level)
+                               ((eql (car alpha) 100) level)
+                               (t '(100 . 100))))))
+
+(global-set-key (kbd "C-c t") #'toggle-transparency)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; HIGHLIGHT TODOs (htodo-mode) based on superego.el
@@ -152,14 +162,14 @@
   (add-hook 'haskell-mode-hook 'turn-on-haskell-doc)
   (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
   (setq haskell-process-args-ghci
-        '("-ferror-spans" "-fshow-loaded-modules"))
+        '("-ferror-spans")) ; "-fshow-loaded-modules"))
   (setq haskell-process-args-cabal-repl
-        '("--ghc-options=-ferror-spans -fshow-loaded-modules"))
+        '("--ghc-options=-ferror-spans")) ; -fshow-loaded-modules"))
   (setq haskell-process-args-stack-ghci
-        '("--ghci-options=-ferror-spans -fshow-loaded-modules"
+        '("--ghci-options=-ferror-spans" ; -fshow-loaded-modules"
           "--no-build" "--no-load"))
   (setq haskell-process-args-cabal-new-repl
-        '("--ghc-options=-ferror-spans -fshow-loaded-modules")))
+        '("--ghc-options=-ferror-spans"))) ; -fshow-loaded-modules")))
 
 (use-package highlight-symbol
   :init
@@ -199,6 +209,11 @@
 (use-package flymake)
 (use-package flymake-cursor)
 (use-package markdown-mode)
+(use-package yaml-mode)
+(use-package dockerfile-mode)
+(use-package terraform-mode)
+(use-package lua-mode)
+(use-package csv-mode)
 
 (use-package monokai-theme
   :init
@@ -226,7 +241,7 @@
 (menu-bar-mode -1)
 
 ;; Default Font
-(setq wert-font "Hack 9"); monospace 9
+(setq wert-font "Hack 11"); monospace 9
 (set-face-attribute 'default nil :font wert-font)
 (add-to-list 'default-frame-alist `(font .  ,wert-font))
 
@@ -267,7 +282,7 @@
 
 ;; Default interpreters for inferior modes
 (setq scheme-program-name "csi")
-(setq inferior-lisp-program "ecl")
+(setq inferior-lisp-program "sbcl")
 (setq python-shell-interpreter "python2")
 
 ;;; Dired Omit Mode (hide .files)
@@ -310,6 +325,37 @@
       jit-lock-stealth-nice 0.5)
 (setq-default font-lock-multiline t)
 
+;;; Transparent mode by default
+(toggle-transparency)
+
+;;; Org mode minted code
+(require 'org)
+(require 'ox-latex)
+
+(add-to-list 'org-latex-packages-alist '("" "minted"))
+(setq org-latex-listings 'minted)
+(setq org-latex-minted-options
+      '(("frame" "lines") ("linenos" "true")
+        ("framesep" "2mm") ("style" "borland")))
+
+(setq org-latex-pdf-process
+      (mapcar
+       (lambda (s)
+         (replace-regexp-in-string "%latex " "%latex -shell-escape " s))
+       org-latex-pdf-process))
+
+;;; F5 to save and export to PDF
+(defun org-export-as-pdf ()
+  (interactive)
+  (save-buffer)
+  (org-latex-export-to-pdf))
+
+(add-hook
+ 'org-mode-hook
+ (lambda()
+   (define-key org-mode-map
+       (kbd "<f5>") 'org-export-as-pdf)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; KEYS
 
@@ -324,6 +370,21 @@
 (global-set-key-progn (kbd "s-S-<backspace>")
                       (delete-region (line-beginning-position)
                                      (line-end-position)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; EXTRA
+
+;;; proverif
+; (add-to-list 'load-path "/opt/proverif/emacs")
+; (setq auto-mode-alist
+; 	      (cons '("\\.horn$" . proverif-horn-mode)
+; 	      (cons '("\\.horntype$" . proverif-horntype-mode)
+; 	      (cons '("\\.pv[l]?$" . proverif-pv-mode)
+;               (cons '("\\.pi$" . proverif-pi-mode) auto-mode-alist)))))
+;         (autoload 'proverif-pv-mode "proverif" "Major mode for editing ProVerif code." t)
+;         (autoload 'proverif-pi-mode "proverif" "Major mode for editing ProVerif code." t)
+;         (autoload 'proverif-horn-mode "proverif" "Major mode for editing ProVerif code." t)
+;         (autoload 'proverif-horntype-mode "proverif" "Major mode for editing ProVerif code." t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CUSTOM

@@ -24,6 +24,7 @@ nmap \q :nohlsearch<CR>
 
 " Open NERDTree with \e
 nmap \e :NERDTreeToggle<CR>
+nmap <f9> :NERDTreeToggle<CR>
 
 " Delete trailing whitespace
 function! DeleteTrailingWhitespace()
@@ -34,4 +35,7 @@ function! DeleteTrailingWhitespace()
 	call setreg('/', old_query)
 endfunction
 nmap \ss :call DeleteTrailingWhitespace()<CR>
+
+" Crypt Method
+set cryptmethod=blowfish2
 
